@@ -1,4 +1,4 @@
- { Routes, Route, Navigate } from 'react-router'
+import { Routes, Route, Navigate } from 'react-router'
 import { useEffect } from 'react'
 import { Toaster } from 'sonner'
 import { AuthProvider, useAuth } from '@/context/AuthContext'
