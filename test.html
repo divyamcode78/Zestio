@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zestio - Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success {
+            color: #10b981;
+            font-weight: bold;
+        }
+        .error {
+            color: #ef4444;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Zestio App Test</h1>
+        <p id="status">Testing basic functionality...</p>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Test basic JavaScript functionality
+        try {
+            const status = document.getElementById('status');
+            const results = document.getElementById('results');
+            
+            // Test 1: Basic JS
+            status.innerHTML = '<span class="success">✓ JavaScript working</span>';
+            
+            // Test 2: LocalStorage
+            try {
+                localStorage.setItem('test', 'value');
+                localStorage.removeItem('test');
+                results.innerHTML += '<p class="success">✓ LocalStorage working</p>';
+            } catch (e) {
+                results.innerHTML += '<p class="error">✗ LocalStorage failed: ' + e.message + '</p>';
+            }
+            
+            // Test 3: Fetch API
+            fetch('/api/test')
+                .then(() => {
+                    results.innerHTML += '<p class="success">✓ Backend API accessible</p>';
+                })
+                .catch(() => {
+                    results.innerHTML += '<p class="error">✗ Backend API not accessible (expected in dev mode)</p>';
+                });
+            
+        } catch (error) {
+            document.getElementById('status').innerHTML = '<span class="error">✗ Critical error: ' + error.message + '</span>';
+        }
+    </script>
+</body>
+</html>
