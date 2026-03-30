@@ -22,6 +22,26 @@ export function CheckoutPage() {
   const [address, setAddress] = useState('')
   const [phone, setPhone] = useState(profile?.phone || '')
   const [instructions, setInstructions] = useState('')
+  
+  // Calculate delivery fees and taxes
+  const calculateDeliveryFee = (distance: number) => {
+    if (distance <= 10) {
+      return 29 // Minimal fee for within 10km
+    } else {
+      return 49 // Higher fee for distances > 10km
+    }
+  }
+  
+  const calculateTaxes = (subtotal: number) => {
+    const platformFee = subtotal * 0.02 // 2% platform fee
+    const gst = subtotal * 0.18 // 18% GST
+    return { platformFee, gst }
+  }
+  
+  // Generate random delivery distances for each restaurant
+  const generateRandomDistance = () => {
+    return Math.floor(Math.random() * 20) + 1 // Random distance between 1-20 km
+  }
 
   const handleProceedToPayment = () => {
     if (!address.trim()) {
@@ -122,30 +142,49 @@ export function CheckoutPage() {
               <CardTitle className="text-lg">Order Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {groups.map((group, index) => (
-                <div key={group.restaurant_id}>
-                  {index > 0 && <Separator className="my-4" />}
-                  <div className="space-y-3">
-                    <h3 className="font-medium">{group.restaurant_name}</h3>
-                    {group.items.map((item) => (
-                      <div key={item.$id} className="flex justify-between text-sm">
-                        <span>
-                          {item.quantity}x {item.item_name}
-                        </span>
-                        <span>{formatCurrency(item.item_price * item.quantity)}</span>
+              {groups.map((group, index) => {
+                const { platformFee, gst } = calculateTaxes(group.subtotal)
+                const distance = generateRandomDistance() // Random distance for this order
+                const deliveryFee = calculateDeliveryFee(distance)
+                
+                return (
+                  <div key={group.restaurant_id}>
+                    {index > 0 && <Separator className="my-4" />}
+                    <div className="space-y-3">
+                      <h3 className="font-medium">{group.restaurant_name}</h3>
+                      {group.items.map((item) => (
+                        <div key={item.$id} className="flex justify-between text-sm">
+                          <span>
+                            {item.quantity}x {item.item_name}
+                          </span>
+                          <span>{formatCurrency(item.item_price * item.quantity)}</span>
+                        </div>
+                      ))}
+                      <div className="flex justify-between text-sm text-muted-foreground">
+                        <span>Subtotal</span>
+                        <span>{formatCurrency(group.subtotal)}</span>
                       </div>
-                    ))}
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>Subtotal</span>
-                      <span>{formatCurrency(group.subtotal)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>Delivery fee</span>
-                      <span>{formatCurrency(group.delivery_fee)}</span>
+                      <div className="flex justify-between text-sm text-muted-foreground">
+                        <span>Delivery fee ({distance} Km)</span>
+                        <span>{formatCurrency(deliveryFee)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm text-muted-foreground">
+                        <span>Platform fee (2%)</span>
+                        <span>{formatCurrency(platformFee)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm text-muted-foreground">
+                        <span>GST (18%)</span>
+                        <span>{formatCurrency(gst)}</span>
+                      </div>
+                      <Separator />
+                      <div className="flex justify-between text-lg font-semibold">
+                        <span>Total</span>
+                        <span>{formatCurrency(group.subtotal + deliveryFee + platformFee + gst)}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </CardContent>
           </Card>
         </div>
@@ -160,18 +199,51 @@ export function CheckoutPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                {groups.map((group) => (
+              {groups.map((group) => {
+                const { platformFee, gst } = calculateTaxes(group.subtotal)
+                const distance = generateRandomDistance() // Random distance for this order
+                const deliveryFee = calculateDeliveryFee(distance)
+                const groupTotal = group.subtotal + deliveryFee + platformFee + gst
+                
+                return (
                   <div key={group.restaurant_id} className="flex justify-between text-sm">
                     <span>{group.restaurant_name}</span>
-                    <span>{formatCurrency(group.subtotal + group.delivery_fee)}</span>
+                    <span>{formatCurrency(groupTotal)}</span>
                   </div>
-                ))}
+                )
+              })}
+              
+              {/* Fee Breakdown */}
+              <div className="mt-4 space-y-2">
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Platform Fee (2%)</span>
+                  <span>{formatCurrency(groups.reduce((sum, group) => 
+                    sum + calculateTaxes(group.subtotal).platformFee, 0))}</span>
+                </div>
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>GST (18%)</span>
+                  <span>{formatCurrency(groups.reduce((sum, group) => 
+                    sum + calculateTaxes(group.subtotal).gst, 0))}</span>
+                </div>
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Delivery Distance</span>
+                  <span>{groups.map(group => {
+                    const distance = generateRandomDistance()
+                    return `${distance} km`
+                  }).join(', ')}</span>
+                </div>
               </div>
+              
               <Separator />
+              
               <div className="flex justify-between text-lg font-semibold">
                 <span>Total</span>
-                <span>{formatCurrency(totalAmount)}</span>
+                <span>{formatCurrency(groups.reduce((sum, group) => {
+                  const { platformFee, gst } = calculateTaxes(group.subtotal)
+                  const distance = generateRandomDistance()
+                  const deliveryFee = calculateDeliveryFee(distance)
+                  return sum + group.subtotal + deliveryFee + platformFee + gst
+                }, 0))}</span>
               </div>
               <Button 
                 className="w-full" 

@@ -76,6 +76,20 @@ export const authAPI = {
   logout: () => {
     localStorage.removeItem('authToken');
   },
+
+  forgotPassword: async (email) => {
+    return await apiCall('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  resetPassword: async (token, newPassword) => {
+    return await apiCall('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, newPassword }),
+    });
+  },
 };
 
 // Restaurants API calls

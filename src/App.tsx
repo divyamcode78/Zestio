@@ -12,17 +12,26 @@ import { AdminLayout } from '@/components/layout/AdminLayout'
 // Auth Pages
 import { LoginPage } from '@/pages/auth/LoginPage'
 import { RegisterPage } from '@/pages/auth/RegisterPage'
+import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage'
 import { RestaurantSignupPage } from '@/pages/auth/RestaurantSignupPage'
 import { DeliveryPartnerSignupPage } from '@/pages/auth/DeliveryPartnerSignupPage'
 
 // Customer Pages
 import { HomePage } from '@/pages/customer/HomePage'
+import { ZestioPlusPage } from '@/pages/customer/ZestioPlusPage'
+import { AboutUsPage } from '@/pages/customer/AboutUsPage'
+import { HelpSupportPage } from '@/pages/customer/HelpSupportPage'
+import { DineOutPage } from '@/pages/customer/DineOutPage'
+import { PrivacyPolicyPage } from '@/pages/customer/PrivacyPolicyPage'
+import { TermsOfServicePage } from '@/pages/customer/TermsOfServicePage'
+import { CookiePolicyPage } from '@/pages/customer/CookiePolicyPage'
 import { RestaurantPage } from '@/pages/customer/RestaurantPage'
 import { CheckoutPage } from '@/pages/customer/CheckoutPage'
 import { PaymentPage } from '@/pages/customer/PaymentPage'
 import { OrderSuccessPage } from '@/pages/customer/OrderSuccessPage'
 import { OrdersPage } from '@/pages/customer/OrdersPage'
 import { TrackingPage } from '@/pages/customer/TrackingPage'
+import { ContactSupportPage } from '@/pages/customer/ContactSupportPage'
 
 // Restaurant Pages
 import { RestaurantDashboard } from '@/pages/restaurant/DashboardPage'
@@ -93,6 +102,7 @@ function AppRoutes() {
       {/* Auth Routes */}
       <Route path="/login" element={isConfigured ? <LoginPage /> : <Navigate to="/setup" replace />} />
       <Route path="/register" element={isConfigured ? <RegisterPage /> : <Navigate to="/setup" replace />} />
+      <Route path="/forgot-password" element={isConfigured ? <ForgotPasswordPage /> : <Navigate to="/setup" replace />} />
       <Route path="/signup/restaurant" element={isConfigured ? <RestaurantSignupPage /> : <Navigate to="/setup" replace />} />
       <Route path="/signup/delivery" element={isConfigured ? <DeliveryPartnerSignupPage /> : <Navigate to="/setup" replace />} />
 
@@ -106,10 +116,18 @@ function AppRoutes() {
         }
       >
         <Route index element={<HomePage />} />
+        <Route path="zestio-plus" element={<ZestioPlusPage />} />
+        <Route path="about" element={<AboutUsPage />} />
+        <Route path="help-support" element={<HelpSupportPage />} />
+        <Route path="dineout" element={<DineOutPage />} />
+        <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route path="terms-of-service" element={<TermsOfServicePage />} />
+        <Route path="cookie-policy" element={<CookiePolicyPage />} />
         <Route path="restaurant/:id" element={<RestaurantPage />} />
         <Route path="checkout" element={<CheckoutPage />} />
         <Route path="payment" element={<PaymentPage />} />
         <Route path="order-success" element={<OrderSuccessPage />} />
+        <Route path="contact-support" element={<ContactSupportPage />} />
         <Route path="orders" element={<OrdersPage />} />
         <Route path="orders/:id/tracking" element={<TrackingPage />} />
       </Route>

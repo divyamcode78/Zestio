@@ -1,0 +1,7 @@
+.heroSection {
+  background-image: url('https://images.unsplash.com/photo-1555396273-3fda1f17b724?w=1200&h=400&fit=crop');
+  background-color: #ff0000; /* Red color for testing */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

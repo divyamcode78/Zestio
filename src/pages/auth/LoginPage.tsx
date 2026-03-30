@@ -24,7 +24,7 @@ export function LoginPage() {
 
     try {
       await login(email, password)
-      toast.success('Welcome back!')
+      toast.success('Welcome back!', { duration: 1500 })
       
       // Redirect based on role - will be handled by route protection
       // but we need to wait for profile to load
@@ -61,19 +61,36 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
+    <div className="relative flex min-h-screen items-center justify-center p-4 overflow-hidden">
+      {/* Video Background */}
+      <video
+        className="absolute inset-0 w-full h-full object-cover"
+        autoPlay
+        loop
+        muted
+        playsInline
+      >
+        {/* Replace this with your video URL */}
+        <source src="/videos/3197345-hd_1920_1080_30fps.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      
+      {/* Overlay for better text visibility */}
+      <div className="absolute inset-0 bg-black/40" />
+      
+      {/* Transparent Login Card */}
+      <Card className="relative w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 shadow-2xl">
         <CardHeader className="text-center">
           <div className={`mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-300 transform hover:scale-110 ${getIconBackground()}`}>
             {getAnimatedIcon()}
           </div>
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>Sign in to your Zestio account</CardDescription>
+          <CardTitle className="text-2xl text-white">Welcome back</CardTitle>
+          <CardDescription className="text-white/80">Sign in to your Zestio account</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-white">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -84,10 +101,11 @@ export function LoginPage() {
                 onBlur={() => setFocusedField(null)}
                 required
                 autoComplete="email"
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-white">Password</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -99,26 +117,37 @@ export function LoginPage() {
                   onBlur={() => setFocusedField(null)}
                   required
                   autoComplete="current-password"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent text-white/60 hover:text-white"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+
+            <div className="flex justify-end">
+              <Link 
+                to="/forgot-password" 
+                className="text-sm text-white/80 hover:text-white hover:underline"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+
+            <Button type="submit" className="w-full bg-white text-black hover:bg-white/90" disabled={isLoading}>
               {isLoading ? <Spinner className="mr-2" /> : null}
               Sign In
             </Button>
           </form>
-          <div className="mt-6 text-center text-sm">
+          <div className="mt-6 text-center text-sm text-white/80">
             {"Don't have an account? "}
-            <Link to="/register" className="font-medium text-accent hover:underline">
+            <Link to="/register" className="font-medium text-white hover:underline">
               Create one
             </Link>
           </div>

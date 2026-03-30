@@ -44,10 +44,6 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
                 <Clock className="h-3.5 w-3.5" />
                 <span>{restaurant.estimated_delivery_time}</span>
               </div>
-              <div className="flex items-center gap-1">
-                <DollarSign className="h-3.5 w-3.5" />
-                <span>{formatCurrency(restaurant.delivery_fee)} delivery</span>
-              </div>
             </div>
           </div>
         </CardContent>

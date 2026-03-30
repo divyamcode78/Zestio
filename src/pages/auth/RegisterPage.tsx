@@ -25,7 +25,7 @@ export function RegisterPage() {
 
     try {
       await register(email, password, name, 'customer')
-      toast.success('Account created successfully!')
+      toast.success('Account created successfully!', { duration: 1500 })
       
       setTimeout(() => {
         navigate('/')
@@ -65,20 +65,36 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
+    <div className="relative flex min-h-screen items-center justify-center p-4 overflow-hidden">
+      {/* Video Background */}
+      <video
+        className="absolute inset-0 w-full h-full object-cover"
+        autoPlay
+        loop
+        muted
+        playsInline
+      >
+        <source src="/videos/3197345-hd_1920_1080_30fps.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      
+      {/* Overlay for better text visibility */}
+      <div className="absolute inset-0 bg-black/40" />
+      
+      {/* Transparent Signup Card */}
+      <Card className="relative w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 shadow-2xl">
         <CardHeader className="text-center">
           <div className={`mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-300 transform hover:scale-110 ${getIconBackground()}`}>
             {getAnimatedIcon()}
           </div>
-          <CardTitle className="text-2xl">Join Zestio</CardTitle>
-          <CardDescription>Order delicious food or start your business journey</CardDescription>
+          <CardTitle className="text-2xl text-white">Join Zestio</CardTitle>
+          <CardDescription className="text-white/80">Order delicious food or start your business journey</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Customer Signup Form */}
           <form onSubmit={handleCustomerSignup} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name" className="text-white">Full Name</Label>
               <Input
                 id="name"
                 type="text"
@@ -89,10 +105,11 @@ export function RegisterPage() {
                 onBlur={() => setFocusedField(null)}
                 required
                 autoComplete="name"
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-white">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -103,10 +120,11 @@ export function RegisterPage() {
                 onBlur={() => setFocusedField(null)}
                 required
                 autoComplete="email"
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-white">Password</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -119,19 +137,21 @@ export function RegisterPage() {
                   required
                   minLength={8}
                   autoComplete="new-password"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent text-white/60 hover:text-white"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+
+            <Button type="submit" className="w-full bg-white text-black hover:bg-white/90" disabled={isLoading}>
               {isLoading ? <Spinner className="mr-2" /> : null}
               Create Customer Account
             </Button>
@@ -139,7 +159,7 @@ export function RegisterPage() {
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t" />
+              <div className="w-full border-t border-white/20" />
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="bg-background px-2 text-muted-foreground">OR</span>
@@ -150,34 +170,34 @@ export function RegisterPage() {
           <div className="space-y-3">
             <Button 
               variant="outline" 
-              className="w-full justify-start h-auto py-4"
+              className="w-full justify-start h-auto py-4 bg-white/10 border-white/20 text-white hover:bg-white/20"
               onClick={() => navigate('/signup/restaurant')}
             >
               <Store className="mr-3 h-5 w-5" />
               <div className="text-left">
                 <div className="font-medium">Become Restaurant Partner</div>
-                <div className="text-xs text-muted-foreground">Manage your restaurant and menu</div>
+                <div className="text-xs text-white/60">Manage your restaurant and menu</div>
               </div>
               <ArrowRight className="ml-auto h-4 w-4" />
             </Button>
 
             <Button 
               variant="outline" 
-              className="w-full justify-start h-auto py-4"
+              className="w-full justify-start h-auto py-4 bg-white/10 border-white/20 text-white hover:bg-white/20"
               onClick={() => navigate('/signup/delivery')}
             >
               <Truck className="mr-3 h-5 w-5" />
               <div className="text-left">
                 <div className="font-medium">Become Delivery Partner</div>
-                <div className="text-xs text-muted-foreground">Deliver orders and earn money</div>
+                <div className="text-xs text-white/60">Deliver orders and earn money</div>
               </div>
               <ArrowRight className="ml-auto h-4 w-4" />
             </Button>
           </div>
 
-          <div className="mt-6 text-center text-sm">
+          <div className="mt-6 text-center text-sm text-white/80">
             Already have an account?{' '}
-            <Link to="/login" className="font-medium text-accent hover:underline">
+            <Link to="/login" className="font-medium text-white hover:underline">
               Sign in
             </Link>
           </div>

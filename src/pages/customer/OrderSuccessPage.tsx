@@ -214,8 +214,8 @@ export function OrderSuccessPage() {
                   <Button variant="outline" className="w-full justify-start">
                     Track Order
                   </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    Contact Support
+                  <Button variant="outline" className="w-full justify-start" asChild>
+                    <Link to="/contact-support">Contact Support</Link>
                   </Button>
                   <Button variant="outline" className="w-full justify-start" onClick={() => setShowReceipt(true)}>
                     View Receipt

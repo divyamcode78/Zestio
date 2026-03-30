@@ -210,4 +210,49 @@ router.put('/profile', authenticateToken, [
   }
 });
 
+// Forgot Password
+router.post('/forgot-password', [
+  body('email').isEmail().withMessage('Valid email required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email } = req.body;
+
+    // Check if user exists
+    const [users] = await pool.query(
+      'SELECT id, name FROM users WHERE email = ?',
+      [email]
+    );
+
+    if (users.length === 0) {
+      // Don't reveal if email exists or not for security
+      return res.json({ 
+        message: 'If an account with that email exists, a password reset link has been sent.' 
+      });
+    }
+
+    // TODO: Implement actual email sending
+    // For now, just return success message
+    // In production, you would:
+    // 1. Generate a reset token
+    // 2. Store it in database with expiration
+    // 3. Send email with reset link
+    // 4. Create reset password route
+
+    console.log(`Password reset requested for email: ${email}`);
+    
+    res.json({ 
+      message: 'If an account with that email exists, a password reset link has been sent.' 
+    });
+
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ error: 'Failed to process forgot password request' });
+  }
+});
+
 module.exports = router;

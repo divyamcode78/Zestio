@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router'
-import { Home, ShoppingBag, ClipboardList, User, Menu, X, ShoppingCart, LogOut, Settings, ChevronDown } from 'lucide-react'
+import { Home, ShoppingBag, ClipboardList, User, Menu, X, ShoppingCart, LogOut, Settings, ChevronDown, Utensils } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,10 +13,12 @@ import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
 import { cn } from '@/lib/utils'
 import { CartDrawer } from '@/components/customer/CartDrawer'
+import { Footer } from '@/components/Footer'
 
 const navItems = [
   { href: '/', icon: Home, label: 'Home' },
   { href: '/orders', icon: ClipboardList, label: 'Orders' },
+  { href: '/dineout', icon: Utensils, label: 'DineOut' },
 ]
 
 export function CustomerLayout() {
@@ -170,6 +172,9 @@ export function CustomerLayout() {
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Outlet />
       </main>
+
+      {/* Footer - Full Width */}
+      <Footer />
 
       {/* Cart Drawer */}
       <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
