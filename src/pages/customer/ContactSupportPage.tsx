@@ -87,9 +87,9 @@ export function ContactSupportPage() {
     <div className="space-y-6">
       {/* Back Button */}
       <Button variant="ghost" asChild className="gap-2">
-        <Link to="/order-success">
+        <Link to="/">
           <ArrowLeft className="h-4 w-4" />
-          Back to Order
+          Back to Home
         </Link>
       </Button>
 

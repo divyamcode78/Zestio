@@ -1,3 +1,4 @@
+import React from 'react'
 import { Link } from 'react-router'
 import { Facebook, Twitter, Instagram, Linkedin, Play, Apple, Mail, Phone, MapPin, Globe, Shield, Users, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'

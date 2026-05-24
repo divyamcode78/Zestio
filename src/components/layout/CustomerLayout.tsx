@@ -78,7 +78,7 @@ export function CustomerLayout() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-1 p-2">
                     <User className="h-4 w-4" />
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-medium bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
                       Hi, {profile?.name?.split(' ')[0]}
                     </span>
                     <ChevronDown className="h-4 w-4" />
@@ -121,8 +121,8 @@ export function CustomerLayout() {
                   className={cn(
                     'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     location.pathname === item.href
-                      ? 'bg-accent/10 text-accent'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      ? 'bg-accent/10 text-accent hover:bg-yellow-500 hover:text-yellow-600'
+                      : 'text-muted-foreground hover:bg-muted hover:text-yellow-500'
                   )}
                 >
                   <item.icon className="h-4 w-4" />

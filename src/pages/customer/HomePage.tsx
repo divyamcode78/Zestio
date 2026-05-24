@@ -22,6 +22,12 @@ export function HomePage() {
     async function fetchRestaurants() {
       setIsLoading(true)
 
+      // Always use mock data for now
+      setRestaurants(mockRestaurants)
+      setIsLoading(false)
+
+      // Uncomment this when API is ready
+      /*
       try {
         const params: any = {}
         if (selectedCuisine !== 'All') {
@@ -40,6 +46,7 @@ export function HomePage() {
       } finally {
         setIsLoading(false)
       }
+      */
     }
 
     fetchRestaurants()

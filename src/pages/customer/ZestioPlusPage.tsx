@@ -99,10 +99,8 @@ export function ZestioPlusPage() {
   const navigate = useNavigate()
 
   const handleSubscribe = (planId: string) => {
-    // TODO: Implement subscription logic
-    console.log(`Subscribing to ${planId} plan`)
-    // Navigate to payment page or show success message
-    navigate('/payment-success')
+    // Navigate to payment page with selected plan
+    navigate(`/payment?plan=${planId}`)
   }
 
   return (

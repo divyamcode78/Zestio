@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const { pool } = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
+const { sendWelcomeEmail } = require('../utils/emailService');
 
 const router = express.Router();
 
@@ -41,6 +42,14 @@ router.post('/register', [
       `INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)`,
       [name, email, hashedPassword, role]
     );
+
+    // Send welcome email
+    try {
+      await sendWelcomeEmail(email, name);
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+      // Don't block registration if email fails
+    }
 
     // Generate JWT token
     const token = jwt.sign(

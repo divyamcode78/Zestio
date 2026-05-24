@@ -44,18 +44,12 @@ const paymentMethods: PaymentMethod[] = [
     popular: true,
   },
   {
-    id: 'cash',
-    name: 'Cash on Delivery',
-    icon: <Wallet className="h-5 w-5" />,
-    description: 'Pay when your order arrives',
-  },
-  {
     id: 'razorpay',
     name: 'Razorpay',
     icon: <CreditCard className="h-5 w-5" />,
     description: 'Secure payment via Razorpay',
     popular: true,
-  },
+  }
 ]
 
 export function PaymentPage() {
@@ -63,6 +57,24 @@ export function PaymentPage() {
   const location = useLocation()
   const { groups, totalAmount, clearCart } = useCart()
   const { user, profile } = useAuth()
+  
+  // Check if this is a subscription payment
+  const searchParams = new URLSearchParams(location.search)
+  const planId = searchParams.get('plan')
+  const isSubscription = !!planId
+  
+  // Get subscription pricing
+  const getSubscriptionPrice = (plan: string) => {
+    switch (plan) {
+      case 'monthly': return 299
+      case 'quarterly': return 799
+      case 'annual': return 2999
+      default: return 0
+    }
+  }
+  
+  const subscriptionPrice = getSubscriptionPrice(planId || '')
+  const displayAmount = isSubscription ? subscriptionPrice : totalAmount
   
   // Get order data from location state
   const orderData = location.state?.orderData || {
@@ -182,10 +194,10 @@ export function PaymentPage() {
         // Initialize Razorpay
         const options = {
           key: 'rzp_test_1DP5mmOlF5G5ag', // Test key - replace with your actual key
-          amount: totalAmount * 100, // Amount in paise
+          amount: displayAmount * 100, // Amount in paise
           currency: 'INR',
           name: 'Zestio Food Delivery',
-          description: `Payment for order from ${groups.map(g => g.restaurant_name).join(', ')}`,
+          description: isSubscription ? `Subscription for ${planId} plan` : `Payment for order from ${groups.map(g => g.restaurant_name).join(', ')}`,
           image: '/logo.png',
           handler: (response) => {
             // Razorpay success callback
@@ -303,10 +315,35 @@ export function PaymentPage() {
       return
     }
 
-    processPayment(selectedMethod)
+    if (isSubscription) {
+      // Handle subscription payment
+      processSubscriptionPayment(selectedMethod, planId)
+    } else {
+      // Handle regular order payment
+      processPayment(selectedMethod)
+    }
   }
 
-  if (groups.length === 0) {
+  const processSubscriptionPayment = async (method: string, planId: string) => {
+    setIsProcessing(true)
+    setPaymentLoading(true)
+
+    try {
+      // Simulate subscription payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      toast.success(`Successfully subscribed to ${planId} plan!`)
+      navigate('/')
+    } catch (error) {
+      console.error('Subscription payment error:', error)
+      toast.error('Failed to complete subscription. Please try again.')
+      setIsProcessing(false)
+      setPaymentLoading(false)
+    }
+  }
+
+  // Skip cart check for subscription payments
+  if (groups.length === 0 && !isSubscription) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
@@ -325,14 +362,16 @@ export function PaymentPage() {
     <div className="space-y-6">
       {/* Back Button */}
       <Button variant="ghost" asChild className="gap-2">
-        <Link to="/checkout">
+        <Link to={isSubscription ? "/zestio-plus" : "/checkout"}>
           <ArrowLeft className="h-4 w-4" />
-          Back to Checkout
+          Back to {isSubscription ? "Zestio+" : "Checkout"}
         </Link>
       </Button>
 
       <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-bold">Payment</h1>
+        <h1 className="text-2xl font-bold">
+          {isSubscription ? `Subscribe to ${planId} Plan` : 'Payment'}
+        </h1>
         <Badge variant="secondary">Secure</Badge>
       </div>
 
@@ -522,26 +561,45 @@ export function PaymentPage() {
         <div>
           <Card className="sticky top-24">
             <CardHeader>
-              <CardTitle className="text-lg">Order Summary</CardTitle>
+              <CardTitle className="text-lg">
+                {isSubscription ? 'Subscription Summary' : 'Order Summary'}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Delivery Address */}
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Delivery Address</p>
-                <p className="text-sm text-muted-foreground">{orderData.address}</p>
-                <p className="text-sm text-muted-foreground">{orderData.phone}</p>
-              </div>
+              {!isSubscription && (
+                <>
+                  {/* Delivery Address */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Delivery Address</p>
+                    <p className="text-sm text-muted-foreground">{orderData.address}</p>
+                    <p className="text-sm text-muted-foreground">{orderData.phone}</p>
+                  </div>
 
-              <Separator />
+                  <Separator />
+                </>
+              )}
 
-              {/* Order Items */}
+              {/* Order Items or Subscription Details */}
               <div className="space-y-3">
-                {groups.map((group) => (
-                  <div key={group.restaurant_id} className="space-y-2">
-                    <p className="font-medium text-sm">{group.restaurant_name}</p>
-                    {group.items.map((item) => (
-                      <div key={item.id || item.$id} className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">
+                {isSubscription ? (
+                  <div className="space-y-2">
+                    <p className="font-medium text-sm">Zestio+ {planId} Plan</p>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        {planId === 'monthly' && 'Monthly subscription'}
+                        {planId === 'quarterly' && 'Quarterly subscription'}
+                        {planId === 'annual' && 'Annual subscription'}
+                      </span>
+                      <span>{formatCurrency(subscriptionPrice)}</span>
+                    </div>
+                  </div>
+                ) : (
+                  groups.map((group) => (
+                    <div key={group.restaurant_id} className="space-y-2">
+                      <p className="font-medium text-sm">{group.restaurant_name}</p>
+                      {group.items.map((item) => (
+                        <div key={item.id || item.$id} className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">
                           {item.quantity}x {item.item_name}
                         </span>
                         <span>{formatCurrency(item.item_price * item.quantity)}</span>
@@ -552,7 +610,8 @@ export function PaymentPage() {
                       <span>{formatCurrency(group.delivery_fee)}</span>
                     </div>
                   </div>
-                ))}
+                ))
+                )}
               </div>
 
               <Separator />
@@ -560,7 +619,7 @@ export function PaymentPage() {
               {/* Total */}
               <div className="flex justify-between text-lg font-semibold">
                 <span>Total Amount</span>
-                <span>{formatCurrency(totalAmount)}</span>
+                <span>{formatCurrency(displayAmount)}</span>
               </div>
 
               {/* Pay Button */}
@@ -578,7 +637,7 @@ export function PaymentPage() {
                 ) : (
                   <>
                     <CreditCard className="mr-2 h-4 w-4" />
-                    Pay {formatCurrency(totalAmount)}
+                    Pay {formatCurrency(displayAmount)}
                   </>
                 )}
               </Button>
