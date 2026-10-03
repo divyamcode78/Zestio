@@ -199,7 +199,7 @@ export function PaymentPage() {
           name: 'Zestio Food Delivery',
           description: isSubscription ? `Subscription for ${planId} plan` : `Payment for order from ${groups.map(g => g.restaurant_name).join(', ')}`,
           image: '/logo.png',
-          handler: (response) => {
+          handler: (response: { razorpay_payment_id: string }) => {
             // Razorpay success callback
             const paymentId = response.razorpay_payment_id
             completeOrder('razorpay', paymentId)

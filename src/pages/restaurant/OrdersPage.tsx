@@ -139,19 +139,19 @@ export function RestaurantOrdersPage() {
     }
   }
 
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+  const updateOrderStatus = async (orderId: string, newStatus: Order['status']) => {
     try {
       await databases.updateDocument(DATABASE_ID, COLLECTIONS.ORDERS, orderId, {
         status: newStatus,
         updated_at: new Date().toISOString(),
       })
-      
+
       setOrders((prev) =>
         prev.map((o) =>
           o.$id === orderId ? { ...o, status: newStatus } : o
         )
       )
-      
+
       toast.success(`Order status updated to ${statusConfig[newStatus as keyof typeof statusConfig]?.label}`)
     } catch (error) {
       console.error('Error updating order:', error)
@@ -166,11 +166,11 @@ export function RestaurantOrdersPage() {
     ['picked_up', 'delivered', 'cancelled'].includes(o.status)
   )
 
-  const getNextStatus = (currentStatus: string): string | null => {
-    const flow: Record<string, string> = {
+  const getNextStatus = (currentStatus: string): Order['status'] | null => {
+    const flow: Record<string, Order['status']> = {
       pending: 'confirmed',
       confirmed: 'preparing',
-      preparing: 'ready_for_pickup',
+      preparing: 'ready',
     }
     return flow[currentStatus] || null
   }

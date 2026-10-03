@@ -90,8 +90,9 @@ export function RestaurantDashboard() {
 
       try {
         // Fetch restaurant owned by user
+        const ownerId = (user as { $id?: string; id?: string | number }).$id ?? String((user as { id?: string | number }).id ?? '')
         const restaurantResponse = await databases.listDocuments(DATABASE_ID, COLLECTIONS.RESTAURANTS, [
-          Query.equal('owner_id', user.$id),
+          Query.equal('owner_id', ownerId),
           Query.limit(1),
         ])
 

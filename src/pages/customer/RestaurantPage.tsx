@@ -523,7 +523,8 @@ export function RestaurantPage() {
         const foundRestaurant = mockRestaurants.find(r => r.$id === id)
         if (foundRestaurant) {
           setRestaurant(foundRestaurant)
-          setMenuItems(restaurantMenus[id] || [])
+          const menuForRestaurant = id ? restaurantMenus[id] ?? [] : []
+          setMenuItems(menuForRestaurant)
         } else {
           setRestaurant(null)
           setMenuItems([])
@@ -549,7 +550,8 @@ export function RestaurantPage() {
         const foundRestaurant = mockRestaurants.find(r => r.$id === id)
         if (foundRestaurant) {
           setRestaurant(foundRestaurant)
-          setMenuItems(restaurantMenus[id] || [])
+          const menuForRestaurant = id ? restaurantMenus[id] ?? [] : []
+          setMenuItems(menuForRestaurant)
         } else {
           setRestaurant(null)
           setMenuItems([])

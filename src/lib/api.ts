@@ -1,28 +1,45 @@
 // API configuration for Express backend
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+type QueryParams = Record<string, string | number | boolean | undefined>;
+type ApiRequestOptions = RequestInit & {
+  headers?: HeadersInit;
+};
+
+const buildQueryString = (params: QueryParams = {}) => {
+  const safeParams = Object.fromEntries(
+    Object.entries(params)
+      .filter(([, value]) => value !== undefined)
+      .map(([key, value]) => [key, String(value)])
+  ) as Record<string, string>;
+
+  return new URLSearchParams(safeParams).toString();
+};
+
 // Helper function for API calls
-async function apiCall(endpoint, options = {}) {
-  const config = {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+async function apiCall(endpoint: string, options: ApiRequestOptions = {}) {
+  const headers = new Headers({
+    'Content-Type': 'application/json',
+    ...(options.headers || {}),
+  });
+
+  const config: RequestInit & { headers: Headers } = {
     ...options,
+    headers,
   };
 
   // Add auth token if available
   const token = localStorage.getItem('authToken');
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.set('Authorization', `Bearer ${token}`);
   }
 
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-    
+
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
-      throw new Error(error.error || `HTTP error! status: ${response.status}`);
+      throw new Error((error as { error?: string }).error || `HTTP error! status: ${response.status}`);
     }
 
     return await response.json();
@@ -34,31 +51,29 @@ async function apiCall(endpoint, options = {}) {
 
 // Auth API calls
 export const authAPI = {
-  login: async (email, password) => {
+  login: async (email: string, password: string) => {
     const data = await apiCall('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
-    
-    // Store token
+
     if (data.token) {
       localStorage.setItem('authToken', data.token);
     }
-    
+
     return data;
   },
 
-  register: async (email, password, name, role) => {
+  register: async (email: string, password: string, name: string, role: string) => {
     const data = await apiCall('/auth/register', {
       method: 'POST',
       body: JSON.stringify({ email, password, name, role }),
     });
-    
-    // Store token
+
     if (data.token) {
       localStorage.setItem('authToken', data.token);
     }
-    
+
     return data;
   },
 
@@ -66,7 +81,7 @@ export const authAPI = {
     return await apiCall('/auth/me');
   },
 
-  updateProfile: async (profileData) => {
+  updateProfile: async (profileData: Record<string, unknown>) => {
     return await apiCall('/auth/profile', {
       method: 'PUT',
       body: JSON.stringify(profileData),
@@ -77,14 +92,14 @@ export const authAPI = {
     localStorage.removeItem('authToken');
   },
 
-  forgotPassword: async (email) => {
+  forgotPassword: async (email: string) => {
     return await apiCall('/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ email }),
     });
   },
 
-  resetPassword: async (token, newPassword) => {
+  resetPassword: async (token: string, newPassword: string) => {
     return await apiCall('/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify({ token, newPassword }),
@@ -94,67 +109,67 @@ export const authAPI = {
 
 // Restaurants API calls
 export const restaurantsAPI = {
-  getAll: async (params = {}) => {
-    const queryString = new URLSearchParams(params).toString();
+  getAll: async (params: QueryParams = {}) => {
+    const queryString = buildQueryString(params);
     return await apiCall(`/restaurants?${queryString}`);
   },
 
-  getById: async (id) => {
+  getById: async (id: string | number) => {
     return await apiCall(`/restaurants/${id}`);
   },
 
-  create: async (restaurantData) => {
+  create: async (restaurantData: Record<string, unknown>) => {
     return await apiCall('/restaurants', {
       method: 'POST',
       body: JSON.stringify(restaurantData),
     });
   },
 
-  update: async (id, restaurantData) => {
+  update: async (id: string | number, restaurantData: Record<string, unknown>) => {
     return await apiCall(`/restaurants/${id}`, {
       method: 'PUT',
       body: JSON.stringify(restaurantData),
     });
   },
 
-  getMenu: async (id, params = {}) => {
-    const queryString = new URLSearchParams(params).toString();
+  getMenu: async (id: string | number, params: QueryParams = {}) => {
+    const queryString = buildQueryString(params);
     return await apiCall(`/restaurants/${id}/menu?${queryString}`);
   },
 };
 
 // Menu API calls
 export const menuAPI = {
-  getRestaurantMenu: async (restaurantId, params = {}) => {
-    const queryString = new URLSearchParams(params).toString();
+  getRestaurantMenu: async (restaurantId: string | number, params: QueryParams = {}) => {
+    const queryString = buildQueryString(params);
     return await apiCall(`/menu/restaurant/${restaurantId}?${queryString}`);
   },
 
-  getById: async (id) => {
+  getById: async (id: string | number) => {
     return await apiCall(`/menu/${id}`);
   },
 
-  create: async (menuItemData) => {
+  create: async (menuItemData: Record<string, unknown>) => {
     return await apiCall('/menu', {
       method: 'POST',
       body: JSON.stringify(menuItemData),
     });
   },
 
-  update: async (id, menuItemData) => {
+  update: async (id: string | number, menuItemData: Record<string, unknown>) => {
     return await apiCall(`/menu/${id}`, {
       method: 'PUT',
       body: JSON.stringify(menuItemData),
     });
   },
 
-  delete: async (id) => {
+  delete: async (id: string | number) => {
     return await apiCall(`/menu/${id}`, {
       method: 'DELETE',
     });
   },
 
-  toggleAvailability: async (id) => {
+  toggleAvailability: async (id: string | number) => {
     return await apiCall(`/menu/${id}/toggle-availability`, {
       method: 'PATCH',
     });
@@ -167,21 +182,21 @@ export const cartAPI = {
     return await apiCall('/cart');
   },
 
-  add: async (menuItemId, quantity = 1) => {
+  add: async (menuItemId: string | number, quantity = 1) => {
     return await apiCall('/cart/add', {
       method: 'POST',
       body: JSON.stringify({ menu_item_id: menuItemId, quantity }),
     });
   },
 
-  update: async (id, quantity) => {
+  update: async (id: string | number, quantity: number) => {
     return await apiCall(`/cart/${id}`, {
       method: 'PUT',
       body: JSON.stringify({ quantity }),
     });
   },
 
-  remove: async (id) => {
+  remove: async (id: string | number) => {
     return await apiCall(`/cart/${id}`, {
       method: 'DELETE',
     });
@@ -200,65 +215,65 @@ export const cartAPI = {
 
 // Orders API calls
 export const ordersAPI = {
-  getMyOrders: async (params = {}) => {
-    const queryString = new URLSearchParams(params).toString();
+  getMyOrders: async (params: QueryParams = {}) => {
+    const queryString = buildQueryString(params);
     return await apiCall(`/orders/my-orders?${queryString}`);
   },
 
-  getById: async (id) => {
+  getById: async (id: string | number) => {
     return await apiCall(`/orders/${id}`);
   },
 
-  create: async (orderData) => {
+  create: async (orderData: Record<string, unknown>) => {
     return await apiCall('/orders', {
       method: 'POST',
       body: JSON.stringify(orderData),
     });
   },
 
-  updateStatus: async (id, status) => {
+  updateStatus: async (id: string | number, status: string) => {
     return await apiCall(`/orders/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     });
   },
 
-  getRestaurantOrders: async (params = {}) => {
-    const queryString = new URLSearchParams(params).toString();
+  getRestaurantOrders: async (params: QueryParams = {}) => {
+    const queryString = buildQueryString(params);
     return await apiCall(`/orders/restaurant/my-orders?${queryString}`);
   },
 
-  getDriverOrders: async (params = {}) => {
-    const queryString = new URLSearchParams(params).toString();
+  getDriverOrders: async (params: QueryParams = {}) => {
+    const queryString = buildQueryString(params);
     return await apiCall(`/orders/driver/my-orders?${queryString}`);
   },
 };
 
 // Users API calls (admin)
 export const usersAPI = {
-  getAll: async (params = {}) => {
-    const queryString = new URLSearchParams(params).toString();
+  getAll: async (params: QueryParams = {}) => {
+    const queryString = buildQueryString(params);
     return await apiCall(`/users?${queryString}`);
   },
 
-  getById: async (id) => {
+  getById: async (id: string | number) => {
     return await apiCall(`/users/${id}`);
   },
 
-  update: async (id, userData) => {
+  update: async (id: string | number, userData: Record<string, unknown>) => {
     return await apiCall(`/users/${id}`, {
       method: 'PUT',
       body: JSON.stringify(userData),
     });
   },
 
-  delete: async (id) => {
+  delete: async (id: string | number) => {
     return await apiCall(`/users/${id}`, {
       method: 'DELETE',
     });
   },
 
-  toggleActive: async (id) => {
+  toggleActive: async (id: string | number) => {
     return await apiCall(`/users/${id}/toggle-active`, {
       method: 'PATCH',
     });

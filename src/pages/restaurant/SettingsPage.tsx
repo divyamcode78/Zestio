@@ -103,7 +103,7 @@ export default function SettingsPage() {
       const width = field === 'cover_image_url' ? 1200 : 400
       const height = field === 'cover_image_url' ? 400 : 400
       const url = storage.getFilePreview(STORAGE_BUCKET_ID, response.$id, width, height)
-      setForm((prev) => ({ ...prev, [field]: url.href }))
+      setForm((prev) => ({ ...prev, [field]: url }))
       toast.success('Image uploaded')
     } catch (error) {
       console.error('Error uploading image:', error)
@@ -127,9 +127,9 @@ export default function SettingsPage() {
         image_url: form.image_url,
         cover_image_url: form.cover_image_url,
         is_open: form.is_open,
-        min_order_amount: parseFloat(form.min_order_amount) || 0,
+        min_order: parseFloat(form.min_order_amount) || 0,
         delivery_fee: parseFloat(form.delivery_fee) || 0,
-        estimated_delivery_time: parseInt(form.estimated_delivery_time) || 30,
+        estimated_delivery_time: form.estimated_delivery_time,
         opening_hours: form.opening_hours,
       }
 

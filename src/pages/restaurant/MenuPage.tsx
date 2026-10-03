@@ -99,7 +99,7 @@ export function MenuManagementPage() {
     try {
       const response = await storage.createFile(STORAGE_BUCKET_ID, ID.unique(), file)
       const url = storage.getFilePreview(STORAGE_BUCKET_ID, response.$id, 400, 400)
-      setForm((prev) => ({ ...prev, image_url: url.href }))
+      setForm((prev) => ({ ...prev, image_url: url }))
       toast.success('Image uploaded')
     } catch (error) {
       console.error('Error uploading image:', error)

@@ -21,8 +21,8 @@ export interface Restaurant extends Models.Document {
   name: string
   description: string
   address: string
-  latitude: number
-  longitude: number
+  latitude?: number
+  longitude?: number
   image_url?: string
   is_active: boolean
   is_approved: boolean

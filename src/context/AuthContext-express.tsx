@@ -5,6 +5,7 @@ import type { User, UserRole } from '@/types/database'
 
 interface AuthUser {
   id: number
+  $id?: string
   name: string
   email: string
   role: UserRole
@@ -83,8 +84,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!mockUser) {
         throw new Error('Invalid email or password')
       }
-      
-      setUser(mockUser as AuthUser)
+
+      const authMockUser = { ...mockUser, id: Number(mockUser.$id ?? 0), created_at: mockUser.$createdAt ?? new Date().toISOString() } as AuthUser
+      setUser(authMockUser)
       setProfile(mockUser)
       localStorage.setItem('mockUser', JSON.stringify(mockUser))
     }
@@ -101,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (existingUser) {
         throw new Error('Email already exists')
       }
-      
+
       const newUser = {
         id: Date.now(),
         $id: Date.now().toString(),
@@ -118,8 +120,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         address: '',
         phone: ''
       } as User
-      
-      setUser(newUser as AuthUser)
+
+      const authNewUser = { ...newUser, id: Number(newUser.$id ?? Date.now()), created_at: newUser.$createdAt ?? new Date().toISOString() } as AuthUser
+      setUser(authNewUser)
       setProfile(newUser)
       localStorage.setItem('mockUser', JSON.stringify(newUser))
     }
